@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Dream Journal API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dreams
+    description: Dream journal entries
 paths:
   /healthz:
     get:
@@ -24,6 +26,117 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dreams:
+    get:
+      operationId: listDreams
+      tags: [dreams]
+      summary: List all dream entries
+      responses:
+        "200":
+          description: List of dream entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dream"
+    post:
+      operationId: createDream
+      tags: [dreams]
+      summary: Create a new dream entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DreamInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dream"
+        "400":
+          description: Validation error
+
+  /dreams/stats:
+    get:
+      operationId: getDreamStats
+      tags: [dreams]
+      summary: Get aggregated dream statistics
+      responses:
+        "200":
+          description: Aggregated dream statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DreamStats"
+
+  /dreams/{id}:
+    get:
+      operationId: getDream
+      tags: [dreams]
+      summary: Get a specific dream entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Dream entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dream"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateDream
+      tags: [dreams]
+      summary: Update a dream entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DreamUpdate"
+      responses:
+        "200":
+          description: Updated dream entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dream"
+        "400":
+          description: Validation error
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteDream
+      tags: [dreams]
+      summary: Delete a dream entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +147,180 @@ components:
       required:
         - status
 
+    Emotions:
+      type: object
+      description: Emotion intensities for a dream (each 0-10)
+      properties:
+        angry:
+          type: number
+          minimum: 0
+          maximum: 10
+        sad:
+          type: number
+          minimum: 0
+          maximum: 10
+        disgust:
+          type: number
+          minimum: 0
+          maximum: 10
+        happy:
+          type: number
+          minimum: 0
+          maximum: 10
+        peaceful:
+          type: number
+          minimum: 0
+          maximum: 10
+        neutral:
+          type: number
+          minimum: 0
+          maximum: 10
+      required:
+        - angry
+        - sad
+        - disgust
+        - happy
+        - peaceful
+        - neutral
+
+    Dream:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          description: "Date of the dream (YYYY-MM-DD)"
+        title:
+          type: string
+        description:
+          type: string
+        emotions:
+          $ref: "#/components/schemas/Emotions"
+        lucidity:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: How lucid the dream was (0=not aware, 10=fully lucid)
+        clarity:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: How vivid/clear the dream felt (0=foggy, 10=crystal clear)
+        nightmareFactor:
+          type: number
+          minimum: 0
+          maximum: 10
+          description: Nightmare intensity (0=pleasant, 10=extreme nightmare)
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - date
+        - title
+        - description
+        - emotions
+        - lucidity
+        - clarity
+        - nightmareFactor
+        - createdAt
+        - updatedAt
+
+    DreamInput:
+      type: object
+      properties:
+        date:
+          type: string
+          description: "Date of the dream (YYYY-MM-DD)"
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        emotions:
+          $ref: "#/components/schemas/Emotions"
+        lucidity:
+          type: number
+          minimum: 0
+          maximum: 10
+        clarity:
+          type: number
+          minimum: 0
+          maximum: 10
+        nightmareFactor:
+          type: number
+          minimum: 0
+          maximum: 10
+      required:
+        - date
+        - title
+        - description
+        - emotions
+        - lucidity
+        - clarity
+        - nightmareFactor
+
+    DreamUpdate:
+      type: object
+      properties:
+        date:
+          type: string
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        emotions:
+          $ref: "#/components/schemas/Emotions"
+        lucidity:
+          type: number
+          minimum: 0
+          maximum: 10
+        clarity:
+          type: number
+          minimum: 0
+          maximum: 10
+        nightmareFactor:
+          type: number
+          minimum: 0
+          maximum: 10
+
+    DreamStats:
+      type: object
+      properties:
+        totalEntries:
+          type: integer
+        currentStreak:
+          type: integer
+          description: Number of consecutive days with a dream entry
+        longestStreak:
+          type: integer
+          description: All-time longest consecutive daily entry streak
+        avgLucidity:
+          type: number
+        avgClarity:
+          type: number
+        avgNightmareFactor:
+          type: number
+        avgEntryLength:
+          type: number
+          description: Average word count of dream descriptions
+        nightmareFrequency:
+          type: number
+          description: Fraction of entries with nightmareFactor >= 7 (0.0 - 1.0)
+        avgEmotions:
+          $ref: "#/components/schemas/Emotions"
+      required:
+        - totalEntries
+        - currentStreak
+        - longestStreak
+        - avgLucidity
+        - avgClarity
+        - avgNightmareFactor
+        - avgEntryLength
+        - nightmareFrequency
+        - avgEmotions

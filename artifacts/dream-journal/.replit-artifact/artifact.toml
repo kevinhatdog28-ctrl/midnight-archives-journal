@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Dream Journal"
+version = "1.0.0"
+id = "artifacts/dream-journal"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24898
+
+[services.development]
+run = "pnpm --filter @workspace/dream-journal run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/dream-journal", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/dream-journal/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24898"
+BASE_PATH = "/"
