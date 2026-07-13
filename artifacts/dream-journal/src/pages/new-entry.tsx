@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -38,15 +38,20 @@ type DreamFormValues = z.infer<typeof dreamSchema>;
 
 export default function NewEntryPage() {
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const createDream = useCreateDream();
+
+  const searchParams = new URLSearchParams(searchString);
+  const dateParam = searchParams.get("date");
+  const defaultDate = dateParam || format(new Date(), "yyyy-MM-dd");
 
   const form = useForm<DreamFormValues>({
     resolver: zodResolver(dreamSchema),
     defaultValues: {
       title: "",
-      date: format(new Date(), "yyyy-MM-dd"),
+      date: defaultDate,
       description: "",
       emotions: {
         angry: 0,

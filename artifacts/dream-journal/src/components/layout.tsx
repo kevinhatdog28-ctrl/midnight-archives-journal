@@ -1,12 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { MoonStar, Book, BarChart3, Plus, Sparkles } from "lucide-react";
+import { MoonStar, Book, BarChart3, Plus, Sparkles, CalendarDays } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const navItems = [
     { href: "/", label: "Journal", icon: Book },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/new", label: "New Entry", icon: Plus },
     { href: "/stats", label: "Insights", icon: BarChart3 },
   ];

@@ -8,6 +8,7 @@ import { Layout } from '@/components/layout';
 
 import JournalPage from '@/pages/journal';
 import NewEntryPage from '@/pages/new-entry';
+import CalendarPage from '@/pages/calendar';
 import DreamDetailPage from '@/pages/dream-detail';
 import StatsPage from '@/pages/stats';
 
@@ -18,6 +19,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={JournalPage} />
+        <Route path="/calendar" component={CalendarPage} />
         <Route path="/new" component={NewEntryPage} />
         <Route path="/stats" component={StatsPage} />
         <Route path="/dreams/:id" component={DreamDetailPage} />
