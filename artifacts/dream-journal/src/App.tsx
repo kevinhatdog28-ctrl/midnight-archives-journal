@@ -5,6 +5,8 @@ import NotFound from '@/pages/not-found';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Layout } from '@/components/layout';
+import { SettingsProvider, useSettings } from '@/contexts/settings-context';
+import { MotionConfig } from 'framer-motion';
 
 import JournalPage from '@/pages/journal';
 import NewEntryPage from '@/pages/new-entry';
@@ -29,16 +31,29 @@ function Router() {
   );
 }
 
+function AnimationGate({ children }: { children: React.ReactNode }) {
+  const { animationsEnabled } = useSettings();
+  return (
+    <MotionConfig reducedMotion={animationsEnabled ? "never" : "always"}>
+      {children}
+    </MotionConfig>
+  );
+}
+
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="dream-journal-theme">
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
+        <SettingsProvider>
+          <TooltipProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+              <AnimationGate>
+                <Router />
+              </AnimationGate>
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
+        </SettingsProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

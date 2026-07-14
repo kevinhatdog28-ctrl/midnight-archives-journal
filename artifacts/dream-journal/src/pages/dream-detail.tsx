@@ -36,6 +36,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Calendar, Trash2, Edit3, X, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { haptic } from "@/lib/haptics";
 
 const dreamSchema = z.object({
   title: z.string().min(1, "A title is required").max(100),
@@ -121,6 +123,7 @@ export default function DreamDetailPage() {
   }
 
   const handleDelete = () => {
+    haptic('error');
     deleteDream.mutate({ id }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
@@ -144,6 +147,7 @@ export default function DreamDetailPage() {
   const onSubmitUpdate = (data: DreamFormValues) => {
     updateDream.mutate({ id, data }, {
       onSuccess: (updatedData) => {
+        haptic('success');
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
         queryClient.setQueryData(getGetDreamQueryKey(id), updatedData);
@@ -164,9 +168,9 @@ export default function DreamDetailPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-700">
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="max-w-3xl mx-auto space-y-8">
       <nav className="flex justify-between items-center">
-        <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+        <Link onClick={() => haptic('tap')} href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Journal
         </Link>
@@ -301,7 +305,8 @@ export default function DreamDetailPage() {
                       <FormLabel className="text-muted-foreground">What happened?</FormLabel>
                       <FormControl>
                         <Textarea 
-                          className="min-h-[200px] resize-y bg-background/50 border-border/50 focus:border-primary/50 text-base leading-relaxed p-4"
+                          autoResize
+                          className="min-h-[160px] bg-background/50 border-border/50 focus:border-primary/50 text-base leading-relaxed p-4"
                           {...field} 
                         />
                       </FormControl>
@@ -350,12 +355,14 @@ export default function DreamDetailPage() {
                           <span className="text-xs text-muted-foreground">{field.value}/10</span>
                         </div>
                         <FormControl>
-                          <Slider 
-                            min={0} max={10} step={1} 
-                            value={[field.value]} 
-                            onValueChange={(vals) => field.onChange(vals[0])}
-                            className="[&_[role=slider]]:border-purple-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-                          />
+                          <div className="px-1">
+                            <Slider 
+                              min={0} max={10} step={1} 
+                              value={[field.value]} 
+                              onValueChange={(vals) => field.onChange(vals[0])}
+                              className="[&_[role=slider]]:border-purple-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                            />
+                          </div>
                         </FormControl>
                       </FormItem>
                     )}
@@ -371,12 +378,14 @@ export default function DreamDetailPage() {
                           <span className="text-xs text-muted-foreground">{field.value}/10</span>
                         </div>
                         <FormControl>
-                          <Slider 
-                            min={0} max={10} step={1} 
-                            value={[field.value]} 
-                            onValueChange={(vals) => field.onChange(vals[0])}
-                            className="[&_[role=slider]]:border-blue-400 [&_[role=slider]]:shadow-[0_0_10px_rgba(96,165,250,0.5)]"
-                          />
+                          <div className="px-1">
+                            <Slider 
+                              min={0} max={10} step={1} 
+                              value={[field.value]} 
+                              onValueChange={(vals) => field.onChange(vals[0])}
+                              className="[&_[role=slider]]:border-blue-400 [&_[role=slider]]:shadow-[0_0_10px_rgba(96,165,250,0.5)]"
+                            />
+                          </div>
                         </FormControl>
                       </FormItem>
                     )}
@@ -392,12 +401,14 @@ export default function DreamDetailPage() {
                           <span className="text-xs text-muted-foreground">{field.value}/10</span>
                         </div>
                         <FormControl>
-                          <Slider 
-                            min={0} max={10} step={1} 
-                            value={[field.value]} 
-                            onValueChange={(vals) => field.onChange(vals[0])}
-                            className="[&_[role=slider]]:border-red-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                          />
+                          <div className="px-1">
+                            <Slider 
+                              min={0} max={10} step={1} 
+                              value={[field.value]} 
+                              onValueChange={(vals) => field.onChange(vals[0])}
+                              className="[&_[role=slider]]:border-red-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                            />
+                          </div>
                         </FormControl>
                       </FormItem>
                     )}
@@ -419,6 +430,6 @@ export default function DreamDetailPage() {
           </Form>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -16,6 +16,8 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { haptic } from "@/lib/haptics";
 
 const dreamSchema = z.object({
   title: z.string().min(1, "A title is required").max(100),
@@ -70,6 +72,7 @@ export default function NewEntryPage() {
   function onSubmit(data: DreamFormValues) {
     createDream.mutate({ data }, {
       onSuccess: (newDream) => {
+        haptic('success');
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
         toast({
@@ -79,6 +82,7 @@ export default function NewEntryPage() {
         setLocation(`/dreams/${newDream.id}`);
       },
       onError: () => {
+        haptic('error');
         toast({
           variant: "destructive",
           title: "Failed to save",
@@ -89,9 +93,9 @@ export default function NewEntryPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }} className="max-w-3xl mx-auto space-y-8">
       <header className="flex flex-col gap-4">
-        <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors w-fit">
+        <Link onClick={() => haptic('tap')} href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors w-fit">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Journal
         </Link>
@@ -151,7 +155,8 @@ export default function NewEntryPage() {
                     <FormControl>
                       <Textarea 
                         placeholder="I was walking through..." 
-                        className="min-h-[200px] resize-y bg-background/50 border-border/50 focus:border-primary/50 text-base leading-relaxed p-4"
+                        autoResize
+                        className="min-h-[160px] bg-background/50 border-border/50 focus:border-primary/50 text-base leading-relaxed p-4"
                         {...field} 
                       />
                     </FormControl>
@@ -202,12 +207,14 @@ export default function NewEntryPage() {
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
-                        <Slider 
-                          min={0} max={10} step={1} 
-                          value={[field.value]} 
-                          onValueChange={(vals) => field.onChange(vals[0])}
-                          className="[&_[role=slider]]:border-purple-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(168,85,247,0.5)]"
-                        />
+                        <div className="px-1">
+                          <Slider 
+                            min={0} max={10} step={1} 
+                            value={[field.value]} 
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="[&_[role=slider]]:border-purple-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                          />
+                        </div>
                       </FormControl>
                       <p className="text-[10px] text-muted-foreground mt-2">0 = Unaware, 10 = Full Control</p>
                     </FormItem>
@@ -224,12 +231,14 @@ export default function NewEntryPage() {
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
-                        <Slider 
-                          min={0} max={10} step={1} 
-                          value={[field.value]} 
-                          onValueChange={(vals) => field.onChange(vals[0])}
-                          className="[&_[role=slider]]:border-blue-400 [&_[role=slider]]:shadow-[0_0_10px_rgba(96,165,250,0.5)]"
-                        />
+                        <div className="px-1">
+                          <Slider 
+                            min={0} max={10} step={1} 
+                            value={[field.value]} 
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="[&_[role=slider]]:border-blue-400 [&_[role=slider]]:shadow-[0_0_10px_rgba(96,165,250,0.5)]"
+                          />
+                        </div>
                       </FormControl>
                       <p className="text-[10px] text-muted-foreground mt-2">0 = Foggy, 10 = Crystal Clear</p>
                     </FormItem>
@@ -246,12 +255,14 @@ export default function NewEntryPage() {
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
-                        <Slider 
-                          min={0} max={10} step={1} 
-                          value={[field.value]} 
-                          onValueChange={(vals) => field.onChange(vals[0])}
-                          className="[&_[role=slider]]:border-red-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(239,68,68,0.5)]"
-                        />
+                        <div className="px-1">
+                          <Slider 
+                            min={0} max={10} step={1} 
+                            value={[field.value]} 
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="[&_[role=slider]]:border-red-500 [&_[role=slider]]:shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                          />
+                        </div>
                       </FormControl>
                       <p className="text-[10px] text-muted-foreground mt-2">0 = Pleasant, 10 = Terrifying</p>
                     </FormItem>
@@ -272,6 +283,6 @@ export default function NewEntryPage() {
           </form>
         </Form>
       </div>
-    </div>
+    </motion.div>
   );
 }

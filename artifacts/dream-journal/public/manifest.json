@@ -1,0 +1,19 @@
+{
+  "name": "Midnight Archives",
+  "short_name": "Midnight Archives",
+  "description": "Your personal dream journal — capture the night before it fades.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040614",
+  "theme_color": "#040614",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -15,6 +15,8 @@ import {
 import { ChevronLeft, ChevronRight, Sparkles, Moon } from "lucide-react";
 import { useListDreams } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { haptic } from "@/lib/haptics";
 
 export default function CalendarPage() {
   const [, setLocation] = useLocation();
@@ -46,20 +48,20 @@ export default function CalendarPage() {
   }, [dreams]);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-5xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-serif text-primary-foreground">Lunar Calendar</h1>
           <p className="text-muted-foreground mt-2 font-light">Trace the patterns of your nocturnal wanderings.</p>
         </div>
         <div className="flex items-center gap-4 bg-card/40 p-2 rounded-2xl border border-border/50 backdrop-blur-sm">
-          <Button variant="ghost" size="icon" onClick={handlePreviousMonth} className="rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => { handlePreviousMonth(); haptic('tap'); }} className="rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <span className="w-32 text-center font-serif text-lg tracking-wide">
             {format(currentDate, "MMMM yyyy")}
           </span>
-          <Button variant="ghost" size="icon" onClick={handleNextMonth} className="rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => { handleNextMonth(); haptic('tap'); }} className="rounded-xl hover:bg-primary/20 hover:text-primary transition-colors">
             <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
@@ -75,7 +77,7 @@ export default function CalendarPage() {
         </div>
         
         <div className="grid grid-cols-7 gap-2 md:gap-3">
-          {days.map((day) => {
+          {days.map((day, index) => {
             const dateStr = format(day, "yyyy-MM-dd");
             const dayDreams = dreamsByDate[dateStr] || [];
             // Sort by id descending so most recent is first
@@ -87,9 +89,13 @@ export default function CalendarPage() {
             const isToday = isSameDay(day, new Date());
             
             return (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.008, duration: 0.3 }}
                 key={dateStr}
                 onClick={() => {
+                  haptic('tap');
                   if (mainDream) {
                     setLocation(`/dreams/${mainDream.id}`);
                   } else {
@@ -138,11 +144,11 @@ export default function CalendarPage() {
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

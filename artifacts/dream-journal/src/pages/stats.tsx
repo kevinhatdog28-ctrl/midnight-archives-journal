@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useGetDreamStats } from "@workspace/api-client-react";
 import { EmotionColors, EmotionNames } from "@/components/emotion-display";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Flame, Star, BrainCircuit, Eye, Skull, ScrollText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+
+function AnimatedNumber({ value, className }: { value: number, className?: string }) {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(count, value, { duration: 1.5, ease: "easeOut" });
+    return controls.stop;
+  }, [value, count]);
+
+  return <motion.span className={className}>{rounded}</motion.span>;
+}
 
 export default function StatsPage() {
   const { data: stats, isLoading } = useGetDreamStats();
@@ -25,7 +38,7 @@ export default function StatsPage() {
   if (!stats) return null;
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-10">
       <header>
         <h1 className="text-3xl md:text-4xl font-serif text-primary-foreground">Insights</h1>
         <p className="text-muted-foreground mt-2 font-light">Patterns emerging from the dark.</p>
@@ -41,7 +54,7 @@ export default function StatsPage() {
           <div>
             <p className="text-sm font-mono tracking-widest text-orange-400/80 uppercase mb-1">Current Streak</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-serif text-orange-100">{stats.currentStreak}</span>
+              <AnimatedNumber value={stats.currentStreak} className="text-5xl font-serif text-orange-100" />
               <span className="text-orange-400/60 font-medium">days</span>
             </div>
           </div>
@@ -55,7 +68,7 @@ export default function StatsPage() {
           <div>
             <p className="text-sm font-mono tracking-widest text-yellow-400/80 uppercase mb-1">Longest Streak</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-serif text-yellow-100">{stats.longestStreak}</span>
+              <AnimatedNumber value={stats.longestStreak} className="text-5xl font-serif text-yellow-100" />
               <span className="text-yellow-400/60 font-medium">days</span>
             </div>
           </div>
@@ -63,24 +76,15 @@ export default function StatsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <MetricCard 
-          title="Total Entries" 
-          value={stats.totalEntries.toString()} 
-          icon={<ScrollText className="w-5 h-5 text-emerald-400" />}
-          description="Dreams recorded so far"
-        />
-        <MetricCard 
-          title="Avg. Entry Length" 
-          value={`${Math.round(stats.avgEntryLength)}`} 
-          suffix=" words"
-          icon={<ScrollText className="w-5 h-5 text-cyan-400" />}
-        />
-        <MetricCard 
-          title="Nightmare Freq." 
-          value={`${Math.round(stats.nightmareFrequency * 100)}%`} 
-          icon={<Skull className="w-5 h-5 text-red-400" />}
-          description="Of dreams are nightmares"
-        />
+        {[
+          { title: "Total Entries", value: stats.totalEntries.toString(), icon: <ScrollText className="w-5 h-5 text-emerald-400" />, desc: "Dreams recorded so far" },
+          { title: "Avg. Entry Length", value: `${Math.round(stats.avgEntryLength)}`, suffix: " words", icon: <ScrollText className="w-5 h-5 text-cyan-400" />, desc: "" },
+          { title: "Nightmare Freq.", value: `${Math.round(stats.nightmareFrequency * 100)}%`, icon: <Skull className="w-5 h-5 text-red-400" />, desc: "Of dreams are nightmares" }
+        ].map((item, index) => (
+          <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: index * 0.06 }}>
+            <MetricCard title={item.title} value={item.value} suffix={item.suffix} description={item.desc} icon={item.icon} />
+          </motion.div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -135,13 +139,13 @@ export default function StatsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function MetricCard({ title, value, suffix = "", description = "", icon }: { title: string, value: string, suffix?: string, description?: string, icon: React.ReactNode }) {
   return (
-    <Card className="bg-card/30 border-border/40 backdrop-blur-sm">
+    <Card className="bg-card/30 border-border/40 backdrop-blur-sm h-full">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-mono tracking-widest text-muted-foreground uppercase">{title}</p>
@@ -172,9 +176,11 @@ function AvgGauge({ label, value, color, icon }: { label: string, value: number,
         <span className="font-mono text-sm text-muted-foreground">{value.toFixed(1)}/10</span>
       </div>
       <div className="h-3 w-full bg-background/50 rounded-full overflow-hidden border border-border/50 shadow-inner p-0.5">
-        <div 
-          className={cn("h-full rounded-full transition-all duration-1000", color)}
-          style={{ width: `${Math.max(percentage, 2)}%` }}
+        <motion.div 
+          initial={{ width: '0%' }}
+          animate={{ width: `${Math.max(percentage, 2)}%` }}
+          transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
+          className={cn("h-full rounded-full transition-colors", color)}
         />
       </div>
     </div>
