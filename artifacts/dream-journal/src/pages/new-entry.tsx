@@ -93,14 +93,14 @@ export default function NewEntryPage() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }} className="max-w-3xl mx-auto space-y-8">
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }} className="max-w-3xl mx-auto space-y-8">
       <header className="flex flex-col gap-4">
         <Link onClick={() => haptic('tap')} href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors w-fit">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Journal
         </Link>
         <div>
-          <h1 className="text-3xl font-serif text-primary-foreground">Record a Dream</h1>
+          <h1 className="text-3xl font-serif">Record a Dream</h1>
           <p className="text-muted-foreground mt-2 font-light">Capture the details before they fade.</p>
         </div>
       </header>

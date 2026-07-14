@@ -168,7 +168,7 @@ export default function DreamDetailPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="max-w-3xl mx-auto space-y-8">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }} className="max-w-3xl mx-auto space-y-8">
       <nav className="flex justify-between items-center">
         <Link onClick={() => haptic('tap')} href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" />

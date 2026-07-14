@@ -38,9 +38,9 @@ export default function StatsPage() {
   if (!stats) return null;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-10">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }} className="space-y-10">
       <header>
-        <h1 className="text-3xl md:text-4xl font-serif text-primary-foreground">Insights</h1>
+        <h1 className="text-3xl md:text-4xl font-serif">Insights</h1>
         <p className="text-muted-foreground mt-2 font-light">Patterns emerging from the dark.</p>
       </header>
 
@@ -52,10 +52,10 @@ export default function StatsPage() {
             <Flame className="w-8 h-8 text-orange-400" />
           </div>
           <div>
-            <p className="text-sm font-mono tracking-widest text-orange-400/80 uppercase mb-1">Current Streak</p>
+            <p className="text-sm font-mono tracking-widest text-orange-700/80 dark:text-orange-400/80 uppercase mb-1">Current Streak</p>
             <div className="flex items-baseline gap-2">
-              <AnimatedNumber value={stats.currentStreak} className="text-5xl font-serif text-orange-100" />
-              <span className="text-orange-400/60 font-medium">days</span>
+              <AnimatedNumber value={stats.currentStreak} className="text-5xl font-serif text-orange-800 dark:text-orange-100" />
+              <span className="text-orange-600/60 dark:text-orange-400/60 font-medium">days</span>
             </div>
           </div>
         </div>
@@ -66,10 +66,10 @@ export default function StatsPage() {
             <Star className="w-8 h-8 text-yellow-400" />
           </div>
           <div>
-            <p className="text-sm font-mono tracking-widest text-yellow-400/80 uppercase mb-1">Longest Streak</p>
+            <p className="text-sm font-mono tracking-widest text-yellow-700/80 dark:text-yellow-400/80 uppercase mb-1">Longest Streak</p>
             <div className="flex items-baseline gap-2">
-              <AnimatedNumber value={stats.longestStreak} className="text-5xl font-serif text-yellow-100" />
-              <span className="text-yellow-400/60 font-medium">days</span>
+              <AnimatedNumber value={stats.longestStreak} className="text-5xl font-serif text-yellow-800 dark:text-yellow-100" />
+              <span className="text-yellow-600/60 dark:text-yellow-400/60 font-medium">days</span>
             </div>
           </div>
         </div>

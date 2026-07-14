@@ -30,10 +30,10 @@ export default function JournalPage() {
   const sortedDreams = dreams ? [...dreams].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-8">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }} className="space-y-8">
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-serif text-primary-foreground">Midnight Archives</h1>
+          <h1 className="text-3xl md:text-4xl font-serif">Midnight Archives</h1>
           <p className="text-muted-foreground mt-2 font-light">Your nightly journeys, captured.</p>
         </div>
         <Link 

@@ -48,10 +48,10 @@ export default function CalendarPage() {
   }, [dreams]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="max-w-5xl mx-auto space-y-8">
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.22,1,0.36,1] }} className="max-w-5xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-serif text-primary-foreground">Lunar Calendar</h1>
+          <h1 className="text-3xl font-serif">Lunar Calendar</h1>
           <p className="text-muted-foreground mt-2 font-light">Trace the patterns of your nocturnal wanderings.</p>
         </div>
         <div className="flex items-center gap-4 bg-card/40 p-2 rounded-2xl border border-border/50 backdrop-blur-sm">
