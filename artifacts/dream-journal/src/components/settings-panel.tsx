@@ -10,16 +10,24 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Moon, Sun, Vibrate, ZapOff, Archive, ChevronRight } from "lucide-react";
+import { Settings, Moon, Sun, Vibrate, ZapOff, Archive, ChevronRight, Check } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useSettings } from "@/contexts/settings-context";
 import { haptic } from "@/lib/haptics";
+import { COLOR_THEMES } from "@/lib/color-themes";
 
 type SettingsPanelProps = { isMobile?: boolean };
 
 export default function SettingsPanel({ isMobile }: SettingsPanelProps) {
   const { theme, setTheme } = useTheme();
-  const { hapticEnabled, setHapticEnabled, animationsEnabled, setAnimationsEnabled } = useSettings();
+  const {
+    hapticEnabled,
+    setHapticEnabled,
+    animationsEnabled,
+    setAnimationsEnabled,
+    colorTheme,
+    setColorTheme,
+  } = useSettings();
   const [, setLocation] = useLocation();
   const [open, setOpen] = React.useState(false);
 
@@ -89,6 +97,53 @@ export default function SettingsPanel({ isMobile }: SettingsPanelProps) {
                 <Moon className="w-4 h-4" />
                 Dark
               </Button>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <div>
+                <p className="text-sm font-medium text-foreground">Color palette</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  A little atmosphere for every page.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {COLOR_THEMES.map((palette) => {
+                  const isSelected = colorTheme === palette.value;
+                  return (
+                    <button
+                      key={palette.value}
+                      type="button"
+                      aria-pressed={isSelected}
+                      title={palette.description}
+                      onClick={() => {
+                        haptic('tap');
+                        setColorTheme(palette.value);
+                      }}
+                      className={`relative text-left rounded-xl border p-2.5 transition-all duration-200 ${
+                        isSelected
+                          ? 'border-primary bg-primary/10 ring-1 ring-primary/40'
+                          : 'border-border/60 bg-muted/20 hover:bg-muted/40 hover:border-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 mb-2">
+                        {palette.swatches.map((swatch) => (
+                          <span
+                            key={swatch}
+                            className="h-4 w-4 rounded-full border border-black/10 dark:border-white/15"
+                            style={{ backgroundColor: swatch }}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[11px] leading-tight font-medium text-foreground pr-4">
+                        {palette.label}
+                      </p>
+                      {isSelected && (
+                        <Check className="absolute right-2.5 bottom-2.5 w-3.5 h-3.5 text-primary" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
