@@ -1,19 +1,20 @@
 import React, { useMemo } from "react";
 import { Link, useLocation } from "wouter";
-import { MoonStar, Book, BarChart3, Plus, Sparkles, CalendarDays } from "lucide-react";
+import { Book, BarChart3, Plus, Sparkles, CalendarDays } from "lucide-react";
 import SettingsPanel from "@/components/settings-panel";
+import { BrandLogo } from "@/components/brand-logo";
 import { haptic } from "@/lib/haptics";
 import { motion } from "framer-motion";
 
+const navItems = [
+  { href: "/",         label: "Journal",   icon: Book },
+  { href: "/calendar", label: "Calendar",  icon: CalendarDays },
+  { href: "/new",      label: "New Entry", icon: Plus },
+  { href: "/stats",    label: "Insights",  icon: BarChart3 },
+];
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-
-  const navItems = [
-    { href: "/",         label: "Journal",   icon: Book },
-    { href: "/calendar", label: "Calendar",  icon: CalendarDays },
-    { href: "/new",      label: "New Entry", icon: Plus },
-    { href: "/stats",    label: "Insights",  icon: BarChart3 },
-  ];
 
   // Particle sizes are memoized to avoid re-randomising on every render
   const particles = useMemo(() => (
@@ -32,9 +33,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* ── Desktop Sidebar ──────────────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-64 border-r border-border/60 bg-sidebar/60 backdrop-blur-xl z-20">
-        <div className="p-6 flex items-center gap-3 text-primary">
-          <MoonStar className="w-6 h-6" />
-          <span className="font-serif text-xl tracking-wider text-foreground">Midnight Archives</span>
+        <div className="p-6">
+          <BrandLogo size="sm" showWordmark />
         </div>
 
         <nav className="flex-1 px-4 space-y-1 mt-4">
@@ -84,11 +84,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
 
         {/* Ambient particles */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
           {particles.map((p) => (
             <motion.div
               key={p.id}
-              className="absolute rounded-full bg-primary opacity-20"
+              className="absolute rounded-full bg-primary opacity-20 [will-change:transform,opacity]"
               style={{
                 width:  `${p.size}px`,
                 height: `${p.size}px`,
