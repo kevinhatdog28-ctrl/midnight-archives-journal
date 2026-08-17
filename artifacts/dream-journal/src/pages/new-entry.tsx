@@ -77,7 +77,7 @@ export default function NewEntryPage() {
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
         toast({
           title: "Dream Recorded",
-          description: "Your journey has been archived.",
+          description: "Your journey has been saved.",
         });
         setLocation(`/dreams/${newDream.id}`);
       },
@@ -105,7 +105,7 @@ export default function NewEntryPage() {
         </div>
       </header>
 
-      <div className="bg-card/40 border border-border/50 rounded-2xl p-6 md:p-8 backdrop-blur-sm shadow-xl">
+      <div className="bg-card/40 border border-border/50 rounded-2xl p-4 sm:p-6 md:p-8 backdrop-blur-sm shadow-xl">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
             
@@ -203,7 +203,7 @@ export default function NewEntryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex justify-between mb-4">
-                        <FormLabel className="text-purple-400">Lucidity</FormLabel>
+                        <FormLabel className="text-purple-700 dark:text-purple-400">Lucidity</FormLabel>
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
@@ -227,7 +227,7 @@ export default function NewEntryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex justify-between mb-4">
-                        <FormLabel className="text-blue-400">Clarity</FormLabel>
+                        <FormLabel className="text-blue-700 dark:text-blue-400">Clarity</FormLabel>
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
@@ -251,7 +251,7 @@ export default function NewEntryPage() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex justify-between mb-4">
-                        <FormLabel className="text-red-400">Nightmare</FormLabel>
+                        <FormLabel className="text-red-700 dark:text-red-400">Nightmare</FormLabel>
                         <span className="text-xs text-muted-foreground">{field.value}/10</span>
                       </div>
                       <FormControl>
@@ -277,7 +277,7 @@ export default function NewEntryPage() {
                 disabled={createDream.isPending}
                 className="w-full md:w-auto px-8 py-6 text-lg rounded-xl dream-glow"
               >
-                {createDream.isPending ? "Archiving..." : "Archive Dream"}
+                {createDream.isPending ? "Entering..." : "Enter Dream"}
               </Button>
             </div>
           </form>

@@ -32,6 +32,11 @@ export interface Dream {
      * @maximum 10
      */
   nightmareFactor: number;
+  /**
+     * ISO timestamp when the dream was archived, or null if active
+     * @nullable
+     */
+  archivedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

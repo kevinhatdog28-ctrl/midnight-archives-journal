@@ -45,7 +45,14 @@ export function EmotionDisplay({
   emotions,
   className,
 }: {
-  emotions: Record<string, number>;
+  emotions: {
+    angry: number;
+    sad: number;
+    disgust: number;
+    happy: number;
+    peaceful: number;
+    neutral: number;
+  };
   className?: string;
 }) {
   const activeEmotions = Object.entries(emotions)

@@ -13,6 +13,7 @@ import NewEntryPage from '@/pages/new-entry';
 import CalendarPage from '@/pages/calendar';
 import DreamDetailPage from '@/pages/dream-detail';
 import StatsPage from '@/pages/stats';
+import ArchivedPage from '@/pages/archived';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ function Router() {
             <Route path="/calendar" component={CalendarPage} />
             <Route path="/new" component={NewEntryPage} />
             <Route path="/stats" component={StatsPage} />
+            <Route path="/archived" component={ArchivedPage} />
             <Route path="/dreams/:id" component={DreamDetailPage} />
             <Route component={NotFound} />
           </Switch>

@@ -31,7 +31,7 @@ paths:
     get:
       operationId: listDreams
       tags: [dreams]
-      summary: List all dream entries
+      summary: List all active (non-archived) dream entries
       responses:
         "200":
           description: List of dream entries
@@ -61,11 +61,26 @@ paths:
         "400":
           description: Validation error
 
+  /dreams/archived:
+    get:
+      operationId: listArchivedDreams
+      tags: [dreams]
+      summary: List all archived dream entries
+      responses:
+        "200":
+          description: List of archived dream entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dream"
+
   /dreams/stats:
     get:
       operationId: getDreamStats
       tags: [dreams]
-      summary: Get aggregated dream statistics
+      summary: Get aggregated dream statistics (active entries only)
       responses:
         "200":
           description: Aggregated dream statistics
@@ -124,7 +139,7 @@ paths:
     delete:
       operationId: deleteDream
       tags: [dreams]
-      summary: Delete a dream entry
+      summary: Permanently delete a dream entry
       parameters:
         - name: id
           in: path
@@ -134,6 +149,48 @@ paths:
       responses:
         "204":
           description: Deleted
+        "404":
+          description: Not found
+
+  /dreams/{id}/archive:
+    post:
+      operationId: archiveDream
+      tags: [dreams]
+      summary: Archive a dream entry (soft-delete)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Archived dream entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dream"
+        "404":
+          description: Not found
+
+  /dreams/{id}/restore:
+    post:
+      operationId: restoreDream
+      tags: [dreams]
+      summary: Restore an archived dream entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored dream entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dream"
         "404":
           description: Not found
 
@@ -212,6 +269,9 @@ components:
           minimum: 0
           maximum: 10
           description: Nightmare intensity (0=pleasant, 10=extreme nightmare)
+        archivedAt:
+          type: ["string", "null"]
+          description: ISO timestamp when the dream was archived, or null if active
         createdAt:
           type: string
         updatedAt:

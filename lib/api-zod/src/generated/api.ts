@@ -18,7 +18,7 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary List all dream entries
+ * @summary List all active (non-archived) dream entries
  */
 export const listDreamsResponseEmotionsAngryMin = 0;
 export const listDreamsResponseEmotionsAngryMax = 10;
@@ -65,6 +65,7 @@ export const ListDreamsResponseItem = zod.object({
   "lucidity": zod.number().min(listDreamsResponseLucidityMin).max(listDreamsResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
   "clarity": zod.number().min(listDreamsResponseClarityMin).max(listDreamsResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
   "nightmareFactor": zod.number().min(listDreamsResponseNightmareFactorMin).max(listDreamsResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -167,13 +168,69 @@ export const CreateDreamResponse = zod.object({
   "lucidity": zod.number().min(createDreamResponseLucidityMin).max(createDreamResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
   "clarity": zod.number().min(createDreamResponseClarityMin).max(createDreamResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
   "nightmareFactor": zod.number().min(createDreamResponseNightmareFactorMin).max(createDreamResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
 
 
 /**
- * @summary Get aggregated dream statistics
+ * @summary List all archived dream entries
+ */
+export const listArchivedDreamsResponseEmotionsAngryMin = 0;
+export const listArchivedDreamsResponseEmotionsAngryMax = 10;
+
+export const listArchivedDreamsResponseEmotionsSadMin = 0;
+export const listArchivedDreamsResponseEmotionsSadMax = 10;
+
+export const listArchivedDreamsResponseEmotionsDisgustMin = 0;
+export const listArchivedDreamsResponseEmotionsDisgustMax = 10;
+
+export const listArchivedDreamsResponseEmotionsHappyMin = 0;
+export const listArchivedDreamsResponseEmotionsHappyMax = 10;
+
+export const listArchivedDreamsResponseEmotionsPeacefulMin = 0;
+export const listArchivedDreamsResponseEmotionsPeacefulMax = 10;
+
+export const listArchivedDreamsResponseEmotionsNeutralMin = 0;
+export const listArchivedDreamsResponseEmotionsNeutralMax = 10;
+
+export const listArchivedDreamsResponseLucidityMin = 0;
+export const listArchivedDreamsResponseLucidityMax = 10;
+
+export const listArchivedDreamsResponseClarityMin = 0;
+export const listArchivedDreamsResponseClarityMax = 10;
+
+export const listArchivedDreamsResponseNightmareFactorMin = 0;
+export const listArchivedDreamsResponseNightmareFactorMax = 10;
+
+
+
+export const ListArchivedDreamsResponseItem = zod.object({
+  "id": zod.number(),
+  "date": zod.string().describe('Date of the dream (YYYY-MM-DD)'),
+  "title": zod.string(),
+  "description": zod.string(),
+  "emotions": zod.object({
+  "angry": zod.number().min(listArchivedDreamsResponseEmotionsAngryMin).max(listArchivedDreamsResponseEmotionsAngryMax),
+  "sad": zod.number().min(listArchivedDreamsResponseEmotionsSadMin).max(listArchivedDreamsResponseEmotionsSadMax),
+  "disgust": zod.number().min(listArchivedDreamsResponseEmotionsDisgustMin).max(listArchivedDreamsResponseEmotionsDisgustMax),
+  "happy": zod.number().min(listArchivedDreamsResponseEmotionsHappyMin).max(listArchivedDreamsResponseEmotionsHappyMax),
+  "peaceful": zod.number().min(listArchivedDreamsResponseEmotionsPeacefulMin).max(listArchivedDreamsResponseEmotionsPeacefulMax),
+  "neutral": zod.number().min(listArchivedDreamsResponseEmotionsNeutralMin).max(listArchivedDreamsResponseEmotionsNeutralMax)
+}).describe('Emotion intensities for a dream (each 0-10)'),
+  "lucidity": zod.number().min(listArchivedDreamsResponseLucidityMin).max(listArchivedDreamsResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
+  "clarity": zod.number().min(listArchivedDreamsResponseClarityMin).max(listArchivedDreamsResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
+  "nightmareFactor": zod.number().min(listArchivedDreamsResponseNightmareFactorMin).max(listArchivedDreamsResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListArchivedDreamsResponse = zod.array(ListArchivedDreamsResponseItem)
+
+
+/**
+ * @summary Get aggregated dream statistics (active entries only)
  */
 export const getDreamStatsResponseAvgEmotionsAngryMin = 0;
 export const getDreamStatsResponseAvgEmotionsAngryMax = 10;
@@ -267,6 +324,7 @@ export const GetDreamResponse = zod.object({
   "lucidity": zod.number().min(getDreamResponseLucidityMin).max(getDreamResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
   "clarity": zod.number().min(getDreamResponseClarityMin).max(getDreamResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
   "nightmareFactor": zod.number().min(getDreamResponseNightmareFactorMin).max(getDreamResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -372,18 +430,135 @@ export const UpdateDreamResponse = zod.object({
   "lucidity": zod.number().min(updateDreamResponseLucidityMin).max(updateDreamResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
   "clarity": zod.number().min(updateDreamResponseClarityMin).max(updateDreamResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
   "nightmareFactor": zod.number().min(updateDreamResponseNightmareFactorMin).max(updateDreamResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
 
 
 /**
- * @summary Delete a dream entry
+ * @summary Permanently delete a dream entry
  */
 export const DeleteDreamParams = zod.object({
   "id": zod.coerce.number()
 })
 
 export const DeleteDreamResponse = zod.void()
+
+
+/**
+ * @summary Archive a dream entry (soft-delete)
+ */
+export const ArchiveDreamParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const archiveDreamResponseEmotionsAngryMin = 0;
+export const archiveDreamResponseEmotionsAngryMax = 10;
+
+export const archiveDreamResponseEmotionsSadMin = 0;
+export const archiveDreamResponseEmotionsSadMax = 10;
+
+export const archiveDreamResponseEmotionsDisgustMin = 0;
+export const archiveDreamResponseEmotionsDisgustMax = 10;
+
+export const archiveDreamResponseEmotionsHappyMin = 0;
+export const archiveDreamResponseEmotionsHappyMax = 10;
+
+export const archiveDreamResponseEmotionsPeacefulMin = 0;
+export const archiveDreamResponseEmotionsPeacefulMax = 10;
+
+export const archiveDreamResponseEmotionsNeutralMin = 0;
+export const archiveDreamResponseEmotionsNeutralMax = 10;
+
+export const archiveDreamResponseLucidityMin = 0;
+export const archiveDreamResponseLucidityMax = 10;
+
+export const archiveDreamResponseClarityMin = 0;
+export const archiveDreamResponseClarityMax = 10;
+
+export const archiveDreamResponseNightmareFactorMin = 0;
+export const archiveDreamResponseNightmareFactorMax = 10;
+
+
+
+export const ArchiveDreamResponse = zod.object({
+  "id": zod.number(),
+  "date": zod.string().describe('Date of the dream (YYYY-MM-DD)'),
+  "title": zod.string(),
+  "description": zod.string(),
+  "emotions": zod.object({
+  "angry": zod.number().min(archiveDreamResponseEmotionsAngryMin).max(archiveDreamResponseEmotionsAngryMax),
+  "sad": zod.number().min(archiveDreamResponseEmotionsSadMin).max(archiveDreamResponseEmotionsSadMax),
+  "disgust": zod.number().min(archiveDreamResponseEmotionsDisgustMin).max(archiveDreamResponseEmotionsDisgustMax),
+  "happy": zod.number().min(archiveDreamResponseEmotionsHappyMin).max(archiveDreamResponseEmotionsHappyMax),
+  "peaceful": zod.number().min(archiveDreamResponseEmotionsPeacefulMin).max(archiveDreamResponseEmotionsPeacefulMax),
+  "neutral": zod.number().min(archiveDreamResponseEmotionsNeutralMin).max(archiveDreamResponseEmotionsNeutralMax)
+}).describe('Emotion intensities for a dream (each 0-10)'),
+  "lucidity": zod.number().min(archiveDreamResponseLucidityMin).max(archiveDreamResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
+  "clarity": zod.number().min(archiveDreamResponseClarityMin).max(archiveDreamResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
+  "nightmareFactor": zod.number().min(archiveDreamResponseNightmareFactorMin).max(archiveDreamResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Restore an archived dream entry
+ */
+export const RestoreDreamParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const restoreDreamResponseEmotionsAngryMin = 0;
+export const restoreDreamResponseEmotionsAngryMax = 10;
+
+export const restoreDreamResponseEmotionsSadMin = 0;
+export const restoreDreamResponseEmotionsSadMax = 10;
+
+export const restoreDreamResponseEmotionsDisgustMin = 0;
+export const restoreDreamResponseEmotionsDisgustMax = 10;
+
+export const restoreDreamResponseEmotionsHappyMin = 0;
+export const restoreDreamResponseEmotionsHappyMax = 10;
+
+export const restoreDreamResponseEmotionsPeacefulMin = 0;
+export const restoreDreamResponseEmotionsPeacefulMax = 10;
+
+export const restoreDreamResponseEmotionsNeutralMin = 0;
+export const restoreDreamResponseEmotionsNeutralMax = 10;
+
+export const restoreDreamResponseLucidityMin = 0;
+export const restoreDreamResponseLucidityMax = 10;
+
+export const restoreDreamResponseClarityMin = 0;
+export const restoreDreamResponseClarityMax = 10;
+
+export const restoreDreamResponseNightmareFactorMin = 0;
+export const restoreDreamResponseNightmareFactorMax = 10;
+
+
+
+export const RestoreDreamResponse = zod.object({
+  "id": zod.number(),
+  "date": zod.string().describe('Date of the dream (YYYY-MM-DD)'),
+  "title": zod.string(),
+  "description": zod.string(),
+  "emotions": zod.object({
+  "angry": zod.number().min(restoreDreamResponseEmotionsAngryMin).max(restoreDreamResponseEmotionsAngryMax),
+  "sad": zod.number().min(restoreDreamResponseEmotionsSadMin).max(restoreDreamResponseEmotionsSadMax),
+  "disgust": zod.number().min(restoreDreamResponseEmotionsDisgustMin).max(restoreDreamResponseEmotionsDisgustMax),
+  "happy": zod.number().min(restoreDreamResponseEmotionsHappyMin).max(restoreDreamResponseEmotionsHappyMax),
+  "peaceful": zod.number().min(restoreDreamResponseEmotionsPeacefulMin).max(restoreDreamResponseEmotionsPeacefulMax),
+  "neutral": zod.number().min(restoreDreamResponseEmotionsNeutralMin).max(restoreDreamResponseEmotionsNeutralMax)
+}).describe('Emotion intensities for a dream (each 0-10)'),
+  "lucidity": zod.number().min(restoreDreamResponseLucidityMin).max(restoreDreamResponseLucidityMax).describe('How lucid the dream was (0=not aware, 10=fully lucid)'),
+  "clarity": zod.number().min(restoreDreamResponseClarityMin).max(restoreDreamResponseClarityMax).describe('How vivid\/clear the dream felt (0=foggy, 10=crystal clear)'),
+  "nightmareFactor": zod.number().min(restoreDreamResponseNightmareFactorMin).max(restoreDreamResponseNightmareFactorMax).describe('Nightmare intensity (0=pleasant, 10=extreme nightmare)'),
+  "archivedAt": zod.string().nullish().describe('ISO timestamp when the dream was archived, or null if active'),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
 
 

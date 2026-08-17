@@ -133,7 +133,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   {isActive && (
                     <motion.div
                       layoutId="mobile-active-pill"
-                      className="absolute inset-0 bg-primary/12 dark:bg-primary/10 rounded-full dream-glow"
+                      className="absolute inset-0 bg-primary/10 rounded-full dream-glow"
                       transition={{ type: "spring", stiffness: 380, damping: 36 }}
                     />
                   )}

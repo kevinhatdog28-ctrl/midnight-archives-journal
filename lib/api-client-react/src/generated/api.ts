@@ -141,7 +141,7 @@ export const getListDreamsUrl = () => {
 }
 
 /**
- * @summary List all dream entries
+ * @summary List all active (non-archived) dream entries
  */
 export const listDreams = async ( options?: RequestInit): Promise<Dream[]> => {
 
@@ -188,7 +188,7 @@ export type ListDreamsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary List all dream entries
+ * @summary List all active (non-archived) dream entries
  */
 
 export function useListDreams<TData = Awaited<ReturnType<typeof listDreams>>, TError = ErrorType<unknown>>(
@@ -280,6 +280,83 @@ export const useCreateDream = <TError = ErrorType<void>,
       return useMutation(getCreateDreamMutationOptions(options));
     }
 
+export const getListArchivedDreamsUrl = () => {
+
+
+
+
+  return `/api/dreams/archived`
+}
+
+/**
+ * @summary List all archived dream entries
+ */
+export const listArchivedDreams = async ( options?: RequestInit): Promise<Dream[]> => {
+
+  return customFetch<Dream[]>(getListArchivedDreamsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListArchivedDreamsQueryKey = () => {
+    return [
+    `/api/dreams/archived`
+    ] as const;
+    }
+
+
+export const getListArchivedDreamsQueryOptions = <TData = Awaited<ReturnType<typeof listArchivedDreams>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArchivedDreams>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListArchivedDreamsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listArchivedDreams>>> = ({ signal }) => listArchivedDreams({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listArchivedDreams>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListArchivedDreamsQueryResult = NonNullable<Awaited<ReturnType<typeof listArchivedDreams>>>
+export type ListArchivedDreamsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all archived dream entries
+ */
+
+export function useListArchivedDreams<TData = Awaited<ReturnType<typeof listArchivedDreams>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listArchivedDreams>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListArchivedDreamsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getGetDreamStatsUrl = () => {
 
 
@@ -289,7 +366,7 @@ export const getGetDreamStatsUrl = () => {
 }
 
 /**
- * @summary Get aggregated dream statistics
+ * @summary Get aggregated dream statistics (active entries only)
  */
 export const getDreamStats = async ( options?: RequestInit): Promise<DreamStats> => {
 
@@ -336,7 +413,7 @@ export type GetDreamStatsQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get aggregated dream statistics
+ * @summary Get aggregated dream statistics (active entries only)
  */
 
 export function useGetDreamStats<TData = Awaited<ReturnType<typeof getDreamStats>>, TError = ErrorType<unknown>>(
@@ -515,7 +592,7 @@ export const getDeleteDreamUrl = (id: number,) => {
 }
 
 /**
- * @summary Delete a dream entry
+ * @summary Permanently delete a dream entry
  */
 export const deleteDream = async (id: number, options?: RequestInit): Promise<void> => {
 
@@ -564,7 +641,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteDreamMutationError = ErrorType<void>
 
     /**
- * @summary Delete a dream entry
+ * @summary Permanently delete a dream entry
  */
 export const useDeleteDream = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDream>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -575,5 +652,147 @@ export const useDeleteDream = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteDreamMutationOptions(options));
+    }
+
+export const getArchiveDreamUrl = (id: number,) => {
+
+
+
+
+  return `/api/dreams/${id}/archive`
+}
+
+/**
+ * @summary Archive a dream entry (soft-delete)
+ */
+export const archiveDream = async (id: number, options?: RequestInit): Promise<Dream> => {
+
+  return customFetch<Dream>(getArchiveDreamUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getArchiveDreamMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveDream>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof archiveDream>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['archiveDream'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof archiveDream>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  archiveDream(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ArchiveDreamMutationResult = NonNullable<Awaited<ReturnType<typeof archiveDream>>>
+
+    export type ArchiveDreamMutationError = ErrorType<void>
+
+    /**
+ * @summary Archive a dream entry (soft-delete)
+ */
+export const useArchiveDream = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof archiveDream>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof archiveDream>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getArchiveDreamMutationOptions(options));
+    }
+
+export const getRestoreDreamUrl = (id: number,) => {
+
+
+
+
+  return `/api/dreams/${id}/restore`
+}
+
+/**
+ * @summary Restore an archived dream entry
+ */
+export const restoreDream = async (id: number, options?: RequestInit): Promise<Dream> => {
+
+  return customFetch<Dream>(getRestoreDreamUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRestoreDreamMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreDream>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof restoreDream>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['restoreDream'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restoreDream>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  restoreDream(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestoreDreamMutationResult = NonNullable<Awaited<ReturnType<typeof restoreDream>>>
+
+    export type RestoreDreamMutationError = ErrorType<void>
+
+    /**
+ * @summary Restore an archived dream entry
+ */
+export const useRestoreDream = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreDream>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof restoreDream>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRestoreDreamMutationOptions(options));
     }
 

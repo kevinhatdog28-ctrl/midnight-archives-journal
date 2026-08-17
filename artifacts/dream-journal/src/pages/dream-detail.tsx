@@ -8,9 +8,12 @@ import {
   useGetDream, 
   useDeleteDream, 
   useUpdateDream,
+  useArchiveDream,
+  useRestoreDream,
   getListDreamsQueryKey, 
   getGetDreamQueryKey, 
-  getGetDreamStatsQueryKey 
+  getGetDreamStatsQueryKey,
+  getListArchivedDreamsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -35,7 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Calendar, Trash2, Edit3, X, Check } from "lucide-react";
+import { ArrowLeft, Calendar, Trash2, Edit3, X, Check, Archive, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { haptic } from "@/lib/haptics";
 
@@ -70,8 +73,10 @@ export default function DreamDetailPage() {
     query: { enabled: !!id, queryKey: getGetDreamQueryKey(id) } 
   });
   
-  const deleteDream = useDeleteDream();
-  const updateDream = useUpdateDream();
+  const deleteDream  = useDeleteDream();
+  const updateDream  = useUpdateDream();
+  const archiveDream = useArchiveDream();
+  const restoreDream = useRestoreDream();
 
   const form = useForm<DreamFormValues>({
     resolver: zodResolver(dreamSchema),
@@ -121,6 +126,41 @@ export default function DreamDetailPage() {
       </div>
     );
   }
+
+  const handleArchive = () => {
+    haptic('heavy');
+    archiveDream.mutate({ id }, {
+      onSuccess: () => {
+        haptic('success');
+        queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListArchivedDreamsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
+        toast({ title: "Dream archived", description: "Moved to your archive." });
+        setLocation('/');
+      },
+      onError: () => {
+        haptic('error');
+        toast({ variant: "destructive", title: "Failed to archive", description: "Please try again." });
+      },
+    });
+  };
+
+  const handleRestore = () => {
+    haptic('success');
+    restoreDream.mutate({ id }, {
+      onSuccess: (updated) => {
+        queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getListArchivedDreamsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
+        queryClient.setQueryData(getGetDreamQueryKey(id), updated);
+        toast({ title: "Dream restored", description: "Back in your journal." });
+      },
+      onError: () => {
+        haptic('error');
+        toast({ variant: "destructive", title: "Restore failed", description: "Please try again." });
+      },
+    });
+  };
 
   const handleDelete = () => {
     haptic('error');
@@ -183,6 +223,30 @@ export default function DreamDetailPage() {
                 Edit
               </Button>
 
+              {dream.archivedAt ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRestore}
+                  disabled={restoreDream.isPending}
+                  className="text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 border border-transparent hover:border-amber-500/30 transition-all"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Restore
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleArchive}
+                  disabled={archiveDream.isPending}
+                  className="text-muted-foreground hover:text-foreground border border-transparent hover:border-border/50 transition-all"
+                >
+                  <Archive className="w-4 h-4 mr-2" />
+                  Archive
+                </Button>
+              )}
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="text-destructive/70 hover:text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20 transition-all">
@@ -217,6 +281,23 @@ export default function DreamDetailPage() {
           )}
         </div>
       </nav>
+
+      {dream.archivedAt && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/8 text-sm">
+          <Archive className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <p className="text-amber-700 dark:text-amber-300 font-medium">
+            This dream is archived.{" "}
+            <button
+              onClick={handleRestore}
+              disabled={restoreDream.isPending}
+              className="underline underline-offset-2 hover:no-underline disabled:opacity-50"
+            >
+              Restore it
+            </button>{" "}
+            to move it back to your journal.
+          </p>
+        </div>
+      )}
 
       {!isEditing ? (
         <article className="space-y-10 animate-in fade-in">
