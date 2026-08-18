@@ -41,6 +41,7 @@ import {
 import { ArrowLeft, Calendar, Trash2, Edit3, X, Check, Archive, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { haptic } from "@/lib/haptics";
+import { saveDreamToFolder } from "@/lib/dream-file-storage";
 
 const dreamSchema = z.object({
   title: z.string().min(1, "A title is required").max(100),
@@ -130,12 +131,18 @@ export default function DreamDetailPage() {
   const handleArchive = () => {
     haptic('heavy');
     archiveDream.mutate({ id }, {
-      onSuccess: () => {
+      onSuccess: async (updated) => {
         haptic('success');
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getListArchivedDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
-        toast({ title: "Dream archived", description: "Moved to your archive." });
+        const backupResult = await saveDreamToFolder(updated);
+        toast({
+          title: "Dream archived",
+          description: backupResult === "saved"
+            ? "Moved to your archive and backed up to your folder."
+            : "Moved to your archive.",
+        });
         setLocation('/');
       },
       onError: () => {
@@ -148,12 +155,18 @@ export default function DreamDetailPage() {
   const handleRestore = () => {
     haptic('success');
     restoreDream.mutate({ id }, {
-      onSuccess: (updated) => {
+      onSuccess: async (updated) => {
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getListArchivedDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
         queryClient.setQueryData(getGetDreamQueryKey(id), updated);
-        toast({ title: "Dream restored", description: "Back in your journal." });
+        const backupResult = await saveDreamToFolder(updated);
+        toast({
+          title: "Dream restored",
+          description: backupResult === "saved"
+            ? "Back in your journal and backed up to your folder."
+            : "Back in your journal.",
+        });
       },
       onError: () => {
         haptic('error');
@@ -186,14 +199,19 @@ export default function DreamDetailPage() {
 
   const onSubmitUpdate = (data: DreamFormValues) => {
     updateDream.mutate({ id, data }, {
-      onSuccess: (updatedData) => {
+      onSuccess: async (updatedData) => {
         haptic('success');
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
         queryClient.setQueryData(getGetDreamQueryKey(id), updatedData);
+        const backupResult = await saveDreamToFolder(updatedData);
         toast({
           title: "Dream Updated",
-          description: "Your memory has been refined.",
+          description: backupResult === "saved"
+            ? "Your memory has been refined and backed up to your folder."
+            : backupResult === "failed"
+              ? "Your memory was updated, but the local backup could not be written."
+              : "Your memory has been refined.",
         });
         setIsEditing(false);
       },

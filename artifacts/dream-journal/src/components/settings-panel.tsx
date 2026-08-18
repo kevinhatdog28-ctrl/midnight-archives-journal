@@ -10,11 +10,12 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Moon, Sun, Vibrate, ZapOff, Archive, ChevronRight, Check } from "lucide-react";
+import { Settings, Moon, Sun, Vibrate, ZapOff, Archive, ChevronRight, Check, FolderOpen } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useSettings } from "@/contexts/settings-context";
 import { haptic } from "@/lib/haptics";
 import { COLOR_THEMES } from "@/lib/color-themes";
+import { useToast } from "@/hooks/use-toast";
 
 type SettingsPanelProps = { isMobile?: boolean };
 
@@ -27,9 +28,14 @@ export default function SettingsPanel({ isMobile }: SettingsPanelProps) {
     setAnimationsEnabled,
     colorTheme,
     setColorTheme,
+    storageSupported,
+    storageFolderName,
+    chooseStorageFolder,
   } = useSettings();
   const [, setLocation] = useLocation();
   const [open, setOpen] = React.useState(false);
+  const [isChoosingFolder, setIsChoosingFolder] = React.useState(false);
+  const { toast } = useToast();
 
   const hasVibrate = typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
@@ -38,6 +44,28 @@ export default function SettingsPanel({ isMobile }: SettingsPanelProps) {
     setOpen(false);
     // Let the sheet close before navigating for a smoother feel
     setTimeout(() => setLocation('/archived'), 150);
+  }
+
+  async function handleChooseFolder() {
+    haptic('tap');
+    setIsChoosingFolder(true);
+    try {
+      const folderName = await chooseStorageFolder();
+      if (folderName) {
+        toast({
+          title: "Storage folder connected",
+          description: `New and edited dreams will be backed up to ${folderName}.`,
+        });
+      }
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Folder access unavailable",
+        description: "Your journal is still saved normally. Try choosing the folder again.",
+      });
+    } finally {
+      setIsChoosingFolder(false);
+    }
   }
 
   return (
@@ -167,6 +195,41 @@ export default function SettingsPanel({ isMobile }: SettingsPanelProps) {
                 disabled={!hasVibrate}
               />
             </div>
+          </div>
+
+          {/* Low Power */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-mono tracking-widest text-primary uppercase">Local Backups</h3>
+            {storageSupported ? (
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <FolderOpen className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-foreground">
+                      {storageFolderName ? `Saving to ${storageFolderName}` : "Choose a storage folder"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Keep a JSON backup of every new or edited dream in a folder you control.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full justify-center gap-2 border-border/60"
+                  onClick={handleChooseFolder}
+                  disabled={isChoosingFolder}
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  {isChoosingFolder ? "Waiting for permission…" : storageFolderName ? "Change folder" : "Allow folder access"}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Folder backups are not supported by this browser. Your dreams will continue to save securely in the journal.
+              </p>
+            )}
           </div>
 
           {/* Low Power */}

@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { setHapticEnabled } from '@/lib/haptics';
 import { isColorTheme, type ColorTheme } from '@/lib/color-themes';
+import {
+  chooseDreamStorageFolder,
+  getDreamStorageFolderName,
+  isDreamStorageSupported,
+} from '@/lib/dream-file-storage';
 
 type SettingsContextType = {
   hapticEnabled: boolean;
@@ -9,6 +14,9 @@ type SettingsContextType = {
   setAnimationsEnabled: (enabled: boolean) => void;
   colorTheme: ColorTheme;
   setColorTheme: (theme: ColorTheme) => void;
+  storageSupported: boolean;
+  storageFolderName: string | null;
+  chooseStorageFolder: () => Promise<string | null>;
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -28,6 +36,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const stored = localStorage.getItem('dream-journal-color-theme');
     return isColorTheme(stored) ? stored : 'cosmic-purple';
   });
+  const [storageFolderName, setStorageFolderName] = useState<string | null>(null);
+  const storageSupported = isDreamStorageSupported();
 
   useEffect(() => {
     localStorage.setItem('somnia-haptic', String(hapticEnabled));
@@ -48,6 +58,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.colorTheme = colorTheme;
   }, [colorTheme]);
 
+  useEffect(() => {
+    if (!storageSupported) return;
+    getDreamStorageFolderName().then(setStorageFolderName).catch(() => setStorageFolderName(null));
+  }, [storageSupported]);
+
+  async function chooseStorageFolder() {
+    const folderName = await chooseDreamStorageFolder();
+    if (folderName) setStorageFolderName(folderName);
+    return folderName;
+  }
+
   return (
     <SettingsContext.Provider value={{
       hapticEnabled,
@@ -56,6 +77,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       setAnimationsEnabled: setAnimationsState,
       colorTheme,
       setColorTheme,
+       storageSupported,
+       storageFolderName,
+       chooseStorageFolder,
     }}>
       {children}
     </SettingsContext.Provider>

@@ -18,6 +18,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { haptic } from "@/lib/haptics";
+import { saveDreamToFolder } from "@/lib/dream-file-storage";
 
 const dreamSchema = z.object({
   title: z.string().min(1, "A title is required").max(100),
@@ -71,13 +72,18 @@ export default function NewEntryPage() {
 
   function onSubmit(data: DreamFormValues) {
     createDream.mutate({ data }, {
-      onSuccess: (newDream) => {
+      onSuccess: async (newDream) => {
         haptic('success');
         queryClient.invalidateQueries({ queryKey: getListDreamsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetDreamStatsQueryKey() });
+        const backupResult = await saveDreamToFolder(newDream);
         toast({
           title: "Dream Recorded",
-          description: "Your journey has been saved.",
+          description: backupResult === "saved"
+            ? "Your journey has been saved and backed up to your folder."
+            : backupResult === "failed"
+              ? "Your journey was saved, but the local backup could not be written."
+              : "Your journey has been saved.",
         });
         setLocation(`/dreams/${newDream.id}`);
       },
